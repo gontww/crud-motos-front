@@ -1,57 +1,62 @@
-# frontend
+# CRUD Motorcycle Rental Application
 
-This template should help get you started developing with Vue 3 in Vite.
+This project is a simple CRUD application for motorcycle rentals built with Vue.js and Vite. It includes three main screens: a login screen, a listing screen for available motorcycles, and a reports screen for rental statistics.
 
-## Recommended IDE Setup
+## Project Structure
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+```
+frontend
+├── src
+│   ├── App.vue                # Main application component with router-view
+│   ├── main.js                # Entry point of the application
+│   ├── assets
+│   │   ├── base.css           # Base styles for the application
+│   │   └── main.css           # Main styles for the application
+│   ├── components
+│   │   ├── LoginScreen.vue    # Component for user login
+│   │   ├── ListingScreen.vue   # Component for displaying available motorcycles
+│   │   └── ReportsScreen.vue   # Component for displaying rental reports
+│   └── router
+│       └── index.js           # Vue Router setup and route definitions
+├── package.json                # npm configuration file
+├── vite.config.js              # Vite configuration file
+└── README.md                   # Project documentation
+```
 
-## Customize configuration
+## Installation
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+To get started with the project, clone the repository and install the dependencies:
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+## Development
+
+To run the application in development mode, use the following command:
 
 ```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+This will start the Vite development server and open the application in your default web browser.
+
+## Build
+
+To build the application for production, run:
 
 ```sh
 npm run build
 ```
 
-### Run Headed Component Tests with [Cypress Component Testing](https://on.cypress.io/component)
+This will create a `dist` directory with the production-ready files.
 
-```sh
-npm run test:unit:dev # or `npm run test:unit` for headless testing
-```
+## Features
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+- User authentication with a login screen.
+- Listing of available motorcycles for rent.
+- Reports screen to view rental statistics.
 
-```sh
-npm run test:e2e:dev
-```
+## Contributing
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
-npm run build
-npm run test:e2e
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or features you'd like to add.
