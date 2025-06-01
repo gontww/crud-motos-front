@@ -1,27 +1,51 @@
-<script>
-import { createRouter, createWebHistory } from 'vue-router'
-import LoginScreen from './components/LoginScreen.vue'
-import ListingScreen from './components/ListingScreen.vue'
-import ReportsScreen from './components/ReportsScreen.vue'
-
-const routes = [
-  { path: '/', component: LoginScreen },
-  { path: '/listings', component: ListingScreen },
-  { path: '/reports', component: ReportsScreen },
-]
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
-
-export default router
-</script>
-
 <template>
-  <router-view />
+  <div v-if="$route.name !== 'Login'" class="app-container">
+    <Header />
+    <div class="main-layout">
+      <Sidebar />
+      <router-view class="router-view" />
+    </div>
+  </div>
+  <div v-else>
+    <router-view />
+  </div>
 </template>
 
-<style>
-/* Add any global styles here */
+<script>
+import Header from './components/Header.vue'
+import Sidebar from './components/Sidebar.vue'
+
+export default {
+  components: {
+    Header,
+    Sidebar,
+  },
+}
+</script>
+
+<style scoped>
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-layout {
+  display: flex;
+  flex: 1;
+  margin-top: 60px;
+  min-height: 0;
+}
+
+.router-view {
+  width: 100%;
+  margin-left: 220px;
+  padding: 20px;
+  min-height: calc(100vh - 60px);
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  position: relative;
+  z-index: 1;
+}
 </style>
