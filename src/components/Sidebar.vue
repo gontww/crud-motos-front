@@ -13,12 +13,12 @@
         <span>Motos</span>
       </el-menu-item>
 
-      <el-menu-item index="/locatarios">
+      <el-menu-item index="/listagem-locatario">
         <el-icon name="User"></el-icon>
         <span>Locatários</span>
       </el-menu-item>
 
-      <el-menu-item index="/alugueis">
+      <el-menu-item index="/listagem-aluguel">
         <el-icon name="Document"></el-icon>
         <span>Aluguéis</span>
       </el-menu-item>
@@ -26,7 +26,7 @@
   </aside>
 </template>
 
-<script setup></script>
+<script></script>
 
 <style scoped>
 .sidebar-menu {

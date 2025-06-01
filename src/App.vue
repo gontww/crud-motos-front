@@ -38,14 +38,12 @@ export default {
 }
 
 .router-view {
-  width: 100%;
+  flex: 1;
   margin-left: 220px;
   padding: 20px;
-  min-height: calc(100vh - 60px);
-  height: 100%;
   box-sizing: border-box;
   overflow: auto;
-  position: relative;
-  z-index: 1;
+  height: calc(100vh - 60px);
+  width: calc(100vw - 220px);
 }
 </style>

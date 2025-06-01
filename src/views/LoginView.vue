@@ -15,45 +15,46 @@
   </el-card>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useNotify } from '@/utils/useNotify'
+<script>
 import api from '@/services/axios'
 
-const username = ref('')
-const password = ref('')
-const router = useRouter()
-const notify = useNotify()
-
-const handleLogin = async () => {
-  try {
-    const response = await api.post('/login', {
-      login: username.value,
-      senha: password.value,
-    })
-
-    const token = response.data
-
-    if (token) {
-      localStorage.setItem('token', token)
-      notify({
-        title: 'Login bem-sucedido',
-        message: `Bem-vindo, ${username.value}!`,
-        type: 'success',
-        customClass: 'dark-notify',
-      })
-      router.push('/listagem-moto')
+export default {
+  data() {
+    return {
+      username: '',
+      password: '',
     }
-  } catch (error) {
-    console.error('Erro no login:', error)
-    notify({
-      title: 'Erro',
-      message: 'Nome ou senha inválidos.',
-      type: 'error',
-      customClass: 'dark-notify',
-    })
-  }
+  },
+  methods: {
+    async handleLogin() {
+      try {
+        const { data: token } = await api.post('/login', {
+          login: this.username,
+          senha: this.password,
+        })
+
+        if (token) {
+          localStorage.setItem('token', token)
+
+          this.$notify({
+            title: 'Login bem-sucedido',
+            message: `Bem-vindo, ${this.username}!`,
+            type: 'success',
+            customClass: 'dark-notify',
+          })
+
+          this.$router.push('/listagem-moto')
+        }
+      } catch (error) {
+        ElNotification({
+          title: 'Erro',
+          message: 'Nome ou senha inválidos.',
+          type: 'error',
+          customClass: 'dark-notify',
+        })
+      }
+    },
+  },
 }
 </script>
 
@@ -63,10 +64,10 @@ const handleLogin = async () => {
   height: 400px;
   margin: 0 auto;
   padding: 2rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--el-border-color);
   border-radius: 8px;
-  background-color: var(--color-background);
-  color: var(--color-text);
+  background-color: var(--el-bg-color);
+  color: var(--el-text-color-primary);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -81,7 +82,7 @@ const handleLogin = async () => {
 h1 {
   text-align: center;
   margin-bottom: 1rem;
-  color: var(--color-heading);
+  color: var(--el-color-primary);
 }
 
 .login-button {

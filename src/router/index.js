@@ -1,20 +1,34 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '@/views/LoginScreen.vue'
-import ListingScreen from '@/views/ListingScreen.vue'
+import LoginView from '@/views/LoginView.vue'
+import ListagemMotosView from '@/views/ListagemMotosView.vue'
+import ListagemLocatariosView from '@/views/ListagemLocatariosView.vue'
+import ListagemAlugueisView from '@/views/ListagemAlugueisView.vue'
 import { isAuthenticated } from '@/services/auth'
 
 const routes = [
   {
     path: '/',
     name: 'Login',
-    component: Login,
+    component: LoginView,
     meta: { requiresAuth: false },
     redirectIfLoggedIn: true,
   },
   {
     path: '/listagem-moto',
     name: 'Listagem de Motos',
-    component: ListingScreen,
+    component: ListagemMotosView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/listagem-locatario',
+    name: 'Listagem de Locatários',
+    component: ListagemLocatariosView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/listagem-aluguel',
+    name: 'Listagem de Aluguéis',
+    component: ListagemAlugueisView,
     meta: { requiresAuth: true },
   },
 ]

@@ -10,19 +10,19 @@
   </header>
 </template>
 
-<script setup>
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-
-const goToProfile = () => {
-  // Implementação futura
-  alert('Funcionalidade de perfil ainda não implementada.')
-}
-
-const logout = () => {
-  localStorage.removeItem('token')
-  router.push('/')
+<script>
+export default {
+  name: 'HeaderComponent',
+  methods: {
+    goToProfile() {
+      // Implementação futura
+      alert('Funcionalidade de perfil ainda não implementada.')
+    },
+    logout() {
+      localStorage.removeItem('token')
+      this.$router.push('/')
+    },
+  },
 }
 </script>
 

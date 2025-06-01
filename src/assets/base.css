@@ -159,3 +159,32 @@ body {
   color: var(--color-text);
   font-weight: 500;
 }
+
+.el-table__empty-block {
+  background-color: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+
+.el-table__row > td {
+  border-right: 1px solid var(--el-border-color) !important;
+}
+
+.el-table__row > td:first-child {
+  border-left: 1px solid var(--el-border-color) !important;
+}
+
+.el-table__row > td:last-child {
+  border-right: none;
+}
+
+.el-table thead tr th {
+  border-right: 1px solid var(--el-border-color) !important;
+}
+
+.el-table thead tr th:last-child {
+  border-right: none;
+}
+
+.el-table thead tr th:first-child {
+  border-left: 1px solid var(--el-border-color) !important;
+}
