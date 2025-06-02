@@ -33,12 +33,16 @@
   border-right: none;
   height: 100%;
 }
+.sidebar-menu .el-menu-item span {
+  user-select: none;
+  pointer-events: none;
+}
 .sidebar {
   position: fixed;
   top: 60px;
   left: 0;
   bottom: 0;
-  width: 220px;
+  width: 170px;
   color: white;
   overflow-y: auto;
   transition: all 0.3s ease;

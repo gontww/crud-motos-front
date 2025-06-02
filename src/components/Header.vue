@@ -4,8 +4,8 @@
       <h1>Locadora de Motos</h1>
     </div>
     <div class="right-section">
-      <el-button icon="User" @click="goToProfile">Perfil</el-button>
-      <el-button icon="SwitchButton" @click="logout">Logout</el-button>
+      <el-button type="info" icon="User" @click="goToProfile">Perfil</el-button>
+      <el-button type="info" icon="SwitchButton" @click="logout">Logout</el-button>
     </div>
   </header>
 </template>

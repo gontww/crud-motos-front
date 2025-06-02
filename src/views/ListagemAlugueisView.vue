@@ -160,15 +160,11 @@
 
 <script>
 import api from '@/services/axios'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 
 export default {
-  components: {
-    Plus,
-    Edit,
-    Delete,
-  },
+  components: { Plus, Edit, Delete },
   data() {
     return {
       alugueis: [],
@@ -194,32 +190,48 @@ export default {
     formatDate(row, column, value) {
       if (!value) return ''
       const date = new Date(value)
-      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}/${date.getFullYear()}`
     },
 
     async fetchAlugueis() {
       try {
-        const response = await api.get('/alugueis')
-        this.alugueis = response.data
+        const { data } = await api.get('/alugueis')
+        this.alugueis = data
       } catch (error) {
-        console.error('Erro ao buscar aluguéis:', error)
-        ElMessage.error('Erro ao carregar lista de aluguéis.')
+        this.$notify({
+          title: 'Erro ao carregar lista de aluguéis.',
+          message: 'Houve um erro ao carregar lista de aluguéis. Tente novamente mais tarde.',
+          type: 'error',
+          customClass: 'dark-notify',
+        })
       }
     },
     async fetchLocatarios() {
       try {
-        const response = await api.get('/locatarios')
-        this.locatarios = response.data
+        const { data } = await api.get('/locatarios')
+        this.locatarios = data
       } catch (error) {
-        console.error('Erro ao buscar locatários:', error)
+        this.$notify({
+          title: 'Erro ao carregar locatários.',
+          message: 'Houve um erro ao carregar lista de locatários.',
+          type: 'error',
+          customClass: 'dark-notify',
+        })
       }
     },
     async fetchMotos() {
       try {
-        const response = await api.get('/motos')
-        this.motos = response.data
+        const { data } = await api.get('/motos')
+        this.motos = data
       } catch (error) {
-        console.error('Erro ao buscar motos:', error)
+        this.$notify({
+          title: 'Erro ao carregar motos.',
+          message: 'Houve um erro ao carregar lista de motos.',
+          type: 'error',
+          customClass: 'dark-notify',
+        })
       }
     },
     handleAddAluguel() {
@@ -234,12 +246,16 @@ export default {
           locatario: { id: this.newAluguel.locatarioId },
         }
 
-        const response = await api.post('/alugueis', payload)
-        this.alugueis.push(response.data)
+        const { data } = await api.post('/alugueis', payload)
+        this.alugueis.push(data)
         this.showDialog = false
-        ElMessage.success('Aluguel cadastrado com sucesso!')
 
-        // Reset form
+        this.$notify({
+          title: 'Aluguel cadastrado com sucesso!',
+          type: 'success',
+          customClass: 'dark-notify',
+        })
+
         this.newAluguel = {
           locatarioId: null,
           motoId: null,
@@ -247,8 +263,12 @@ export default {
           dataFim: '',
         }
       } catch (error) {
-        console.error('Erro ao cadastrar aluguel:', error)
-        ElMessage.error('Erro ao cadastrar aluguel.')
+        this.$notify({
+          title: 'Erro ao cadastrar aluguel.',
+          message: 'Houve um erro ao cadastrar aluguel. Tente novamente mais tarde.',
+          type: 'error',
+          customClass: 'dark-notify',
+        })
       }
     },
     openEditDialog(aluguel) {
@@ -270,14 +290,23 @@ export default {
           locatario: { id: this.editAluguel.locatarioId },
         }
 
-        const response = await api.put(`/alugueis/${this.editAluguel.id}`, payload)
+        const { data } = await api.put(`/alugueis/${this.editAluguel.id}`, payload)
         const idx = this.alugueis.findIndex((a) => a.id === this.editAluguel.id)
-        if (idx > -1) this.alugueis.splice(idx, 1, response.data)
+        if (idx > -1) this.alugueis.splice(idx, 1, data)
         this.showEditDialog = false
-        ElMessage.success('Aluguel atualizado com sucesso!')
+
+        this.$notify({
+          title: 'Aluguel atualizado com sucesso!',
+          type: 'success',
+          customClass: 'dark-notify',
+        })
       } catch (error) {
-        console.error('Erro ao atualizar aluguel:', error)
-        ElMessage.error('Erro ao atualizar aluguel.')
+        this.$notify({
+          title: 'Erro ao atualizar aluguel.',
+          message: 'Houve um erro ao atualizar aluguel. Tente novamente mais tarde.',
+          type: 'error',
+          customClass: 'dark-notify',
+        })
       }
     },
     handleDelete(aluguel) {
@@ -293,10 +322,19 @@ export default {
         try {
           await api.delete(`/alugueis/${aluguel.id}`)
           this.alugueis = this.alugueis.filter((a) => a.id !== aluguel.id)
-          ElMessage.success(`Aluguel de "${aluguel.locatario.nome}" excluído com sucesso!`)
+
+          this.$notify({
+            title: `Aluguel de "${aluguel.locatario.nome}" excluído com sucesso!`,
+            type: 'success',
+            customClass: 'dark-notify',
+          })
         } catch (error) {
-          console.error('Erro ao excluir aluguel:', error)
-          ElMessage.error('Erro ao excluir aluguel.')
+          this.$notify({
+            title: 'Erro ao excluir aluguel.',
+            message: 'Houve um erro ao excluir aluguel. Tente novamente mais tarde.',
+            type: 'error',
+            customClass: 'dark-notify',
+          })
         }
       })
     },
@@ -314,6 +352,7 @@ export default {
 
 h1 {
   margin: 0;
+  color: var(--el-color-primary);
 }
 
 .table-container {

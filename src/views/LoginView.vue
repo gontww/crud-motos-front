@@ -9,7 +9,7 @@
         <el-input v-model="password" type="password" placeholder="Insira sua senha" />
       </el-form-item>
       <el-form-item>
-        <el-button class="login-button" type="primary" @click="handleLogin">Login</el-button>
+        <el-button class="login-button" type="primary" native-type="submit">Login</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -46,7 +46,7 @@ export default {
           this.$router.push('/listagem-moto')
         }
       } catch (error) {
-        ElNotification({
+        this.$notify({
           title: 'Erro',
           message: 'Nome ou senha inválidos.',
           type: 'error',

@@ -12,14 +12,14 @@
 
     <div class="table-container">
       <el-table :data="motorcycles" style="width: 80%" empty-text="Sem Dados">
-        <el-table-column prop="modelo" label="Modelo" width="200" />
+        <el-table-column prop="modelo" label="Modelo" />
         <el-table-column prop="marca" label="Marca" />
-        <el-table-column prop="placa" label="Placa" width="120" />
-        <el-table-column prop="ano" label="Ano" width="100" />
-        <el-table-column prop="cor" label="Cor" width="120" />
-        <el-table-column prop="status" label="Status" width="150" />
+        <el-table-column prop="placa" label="Placa" />
+        <el-table-column prop="ano" label="Ano" />
+        <el-table-column prop="cor" label="Cor" />
+        <el-table-column prop="status" label="Status" />
 
-        <el-table-column label="Ações" width="200">
+        <el-table-column label="Ações">
           <template #default="scope">
             <el-button size="small" type="primary" @click="openEditDialog(scope.row)">
               <template #icon><Edit /></template>
@@ -100,7 +100,7 @@
 
 <script>
 import api from '@/services/axios'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 
 export default {
@@ -135,7 +135,12 @@ export default {
         this.motorcycles = response.data
       } catch (error) {
         console.error('Erro ao buscar motos:', error)
-        ElMessage.error('Erro ao carregar lista de motos.')
+        this.$notify({
+          title: 'Erro ao carregar lista de motos.',
+          message: 'Houve um erro ao carregar lista de motos. Tente novamente mais tarde.',
+          type: 'error',
+          customClass: 'dark-notify',
+        })
       }
     },
     handleAddMotorcycle() {
@@ -146,7 +151,11 @@ export default {
         const response = await api.post('/motos', this.newMoto)
         this.motorcycles.push(response.data)
         this.showDialog = false
-        ElMessage.success('Moto cadastrada com sucesso!')
+        this.$notify({
+          title: 'Moto cadastrada com sucesso!',
+          type: 'success',
+          customClass: 'dark-notify',
+        })
         this.newMoto = {
           placa: '',
           modelo: '',
@@ -156,8 +165,12 @@ export default {
           status: 'DISPONIVEL',
         }
       } catch (error) {
-        console.error('Erro ao cadastrar moto:', error)
-        ElMessage.error('Erro ao cadastrar moto.')
+        this.$notify({
+          title: 'Erro ao cadastrar moto.',
+          message: 'Houve um erro ao tentar cadastrar a moto. Tente novamente mais tarde.',
+          type: 'error',
+          customClass: 'dark-notify',
+        })
       }
     },
     openEditDialog(moto) {
@@ -172,10 +185,18 @@ export default {
           this.motorcycles.splice(index, 1, response.data)
         }
         this.showEditDialog = false
-        ElMessage.success('Moto atualizada com sucesso!')
+        this.$notify({
+          title: 'Moto atualizada com sucesso!',
+          type: 'success',
+          customClass: 'dark-notify',
+        })
       } catch (error) {
-        console.error('Erro ao editar moto:', error)
-        ElMessage.error('Erro ao atualizar moto.')
+        this.$notify({
+          title: 'Erro ao atualizar moto.',
+          message: 'Houve um erro ao atualizar moto. Tente novamente mais tarde.',
+          type: 'error',
+          customClass: 'dark-notify',
+        })
       }
     },
     handleDelete(moto) {
@@ -191,10 +212,18 @@ export default {
         try {
           await api.delete(`/motos/${moto.id}`)
           this.motorcycles = this.motorcycles.filter((m) => m.id !== moto.id)
-          ElMessage.success(`Moto "${moto.modelo}" excluída com sucesso!`)
+          this.$notify({
+            title: `Moto "${moto.modelo}" excluída com sucesso!`,
+            type: 'success',
+            customClass: 'dark-notify',
+          })
         } catch (error) {
-          console.error('Erro ao excluir moto:', error)
-          ElMessage.error('Erro ao excluir moto.')
+          this.$notify({
+            title: 'Erro ao excluir moto.',
+            message: 'Houve um erro ao tentar excluir a moto. Tente novamente mais tarde.',
+            type: 'error',
+            customClass: 'dark-notify',
+          })
         }
       })
     },
@@ -212,6 +241,7 @@ export default {
 
 h1 {
   margin: 0;
+  color: var(--el-color-primary);
 }
 
 .table-container {

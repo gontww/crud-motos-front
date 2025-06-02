@@ -39,11 +39,11 @@ export default {
 
 .router-view {
   flex: 1;
-  margin-left: 220px;
+  margin-left: 170px;
   padding: 20px;
   box-sizing: border-box;
   overflow: auto;
   height: calc(100vh - 60px);
-  width: calc(100vw - 220px);
+  width: calc(100vw - 170px);
 }
 </style>
