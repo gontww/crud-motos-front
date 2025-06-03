@@ -11,7 +11,6 @@ const login = async (login, senha) => {
     }
     return false
   } catch (error) {
-    console.error('Erro ao logar:', error)
     return false
   }
 }

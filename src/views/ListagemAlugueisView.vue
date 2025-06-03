@@ -39,9 +39,14 @@
     </div>
 
     <!-- Modal de cadastro -->
-    <el-dialog v-model="showDialog" title="Cadastrar Novo Aluguel" width="40%">
-      <el-form label-position="top">
-        <el-form-item label="Locatário">
+    <el-dialog
+      v-model="showDialog"
+      title="Cadastrar Novo Aluguel"
+      width="40%"
+      @close="resetNewAluguelForm"
+    >
+      <el-form ref="formAluguel" label-position="top" :rules="rules" :model="newAluguel">
+        <el-form-item label="Locatário" prop="locatarioId">
           <el-select
             v-model="newAluguel.locatarioId"
             placeholder="Selecione um locatário"
@@ -56,7 +61,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Moto">
+        <el-form-item label="Moto" prop="motoId">
           <el-select
             v-model="newAluguel.motoId"
             placeholder="Selecione uma moto"
@@ -71,7 +76,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Data de Início">
+        <el-form-item label="Data de Início" prop="dataInicio">
           <el-date-picker
             v-model="newAluguel.dataInicio"
             type="date"
@@ -81,7 +86,7 @@
           />
         </el-form-item>
 
-        <el-form-item label="Data de Fim">
+        <el-form-item label="Data de Fim" prop="dataFim">
           <el-date-picker
             v-model="newAluguel.dataFim"
             type="date"
@@ -98,9 +103,14 @@
     </el-dialog>
 
     <!-- Modal de edição -->
-    <el-dialog v-model="showEditDialog" title="Editar Aluguel" width="40%">
-      <el-form label-position="top">
-        <el-form-item label="Locatário">
+    <el-dialog
+      v-model="showEditDialog"
+      title="Editar Aluguel"
+      width="40%"
+      @close="resetEditAluguelForm"
+    >
+      <el-form ref="formEdicao" label-position="top" :rules="rules" :model="editAluguel">
+        <el-form-item label="Locatário" prop="locatarioId">
           <el-select
             v-model="editAluguel.locatarioId"
             placeholder="Selecione um locatário"
@@ -115,7 +125,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Moto">
+        <el-form-item label="Moto" prop="motoId">
           <el-select
             v-model="editAluguel.motoId"
             placeholder="Selecione uma moto"
@@ -130,22 +140,24 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Data de Início">
+        <el-form-item label="Data de Início" prop="dataInicio">
           <el-date-picker
             v-model="editAluguel.dataInicio"
             type="date"
             placeholder="Escolha uma data"
             style="width: 100%"
+            format="DD/MM/YYYY"
             value-format="YYYY-MM-DD"
           />
         </el-form-item>
 
-        <el-form-item label="Data de Fim">
+        <el-form-item label="Data de Fim" prop="dataFim">
           <el-date-picker
             v-model="editAluguel.dataFim"
             type="date"
             placeholder="Escolha uma data"
             style="width: 100%"
+            format="DD/MM/YYYY"
             value-format="YYYY-MM-DD"
           />
         </el-form-item>
@@ -172,6 +184,12 @@ export default {
       motos: [],
       showDialog: false,
       showEditDialog: false,
+      rules: {
+        locatarioId: [{ required: true, message: 'Selecione um locatário', trigger: 'change' }],
+        motoId: [{ required: true, message: 'Selecione uma moto', trigger: 'change' }],
+        dataInicio: [{ required: true, message: 'Escolha a data de início', trigger: 'blur' }],
+        dataFim: [{ required: true, message: 'Escolha a data de fim', trigger: 'blur' }],
+      },
       newAluguel: {
         locatarioId: null,
         motoId: null,
@@ -238,6 +256,11 @@ export default {
       this.showDialog = true
     },
     async submitNewAluguel() {
+      const form = this.$refs.formAluguel
+      if (!form) return
+
+      const isValid = await form.validate().catch(() => false)
+      if (!isValid) return
       try {
         const payload = {
           dataInicio: this.newAluguel.dataInicio,
@@ -256,12 +279,7 @@ export default {
           customClass: 'dark-notify',
         })
 
-        this.newAluguel = {
-          locatarioId: null,
-          motoId: null,
-          dataInicio: '',
-          dataFim: '',
-        }
+        this.resetNewAluguelForm()
       } catch (error) {
         this.$notify({
           title: 'Erro ao cadastrar aluguel.',
@@ -282,6 +300,11 @@ export default {
       this.showEditDialog = true
     },
     async submitEditAluguel() {
+      const form = this.$refs.formEdicao
+      if (!form) return
+
+      const isValid = await form.validate().catch(() => false)
+      if (!isValid) return
       try {
         const payload = {
           dataInicio: this.editAluguel.dataInicio,
@@ -300,6 +323,7 @@ export default {
           type: 'success',
           customClass: 'dark-notify',
         })
+        this.resetEditAluguelForm()
       } catch (error) {
         this.$notify({
           title: 'Erro ao atualizar aluguel.',
@@ -337,6 +361,18 @@ export default {
           })
         }
       })
+    },
+    resetNewAluguelForm() {
+      this.newAluguel = {}
+      if (this.$refs.formAluguel) {
+        this.$refs.formAluguel.resetFields()
+      }
+    },
+    resetEditAluguelForm() {
+      this.editAluguel = {}
+      if (this.$refs.formEdicao) {
+        this.$refs.formEdicao.resetFields()
+      }
     },
   },
 }

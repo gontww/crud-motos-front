@@ -33,18 +33,34 @@
     </div>
 
     <!-- Modal de cadastro -->
-    <el-dialog v-model="showDialog" title="Cadastrar Novo Locatário" width="40%">
-      <el-form label-position="top">
-        <el-form-item label="Nome">
+    <el-dialog
+      v-model="showDialog"
+      title="Cadastrar Novo Locatário"
+      @close="resetNewLocatarioForm"
+      width="40%"
+    >
+      <el-form ref="newLocatarioForm" :model="newLocatario" :rules="rules" label-position="top">
+        <el-form-item label="Nome" prop="nome">
           <el-input v-model="newLocatario.nome" placeholder="Ex: João da Silva" />
         </el-form-item>
-        <el-form-item label="CPF">
-          <el-input v-model="newLocatario.cpf" placeholder="Ex: 123.456.789-00" />
+
+        <el-form-item label="CPF" prop="cpf">
+          <el-input
+            v-model="newLocatario.cpf"
+            v-mask="'###.###.###-##'"
+            placeholder="Ex: 123.456.789-00"
+          />
         </el-form-item>
-        <el-form-item label="Telefone">
-          <el-input v-model="newLocatario.telefone" placeholder="Ex: (11) 91234‑5678" />
+
+        <el-form-item label="Telefone" prop="telefone">
+          <el-input
+            v-model="newLocatario.telefone"
+            v-mask="'(##) #####-####'"
+            placeholder="Ex: (11) 91234-5678"
+          />
         </el-form-item>
-        <el-form-item label="E‑mail">
+
+        <el-form-item label="E-mail" prop="email">
           <el-input v-model="newLocatario.email" placeholder="Ex: joao@email.com" />
         </el-form-item>
       </el-form>
@@ -55,18 +71,31 @@
     </el-dialog>
 
     <!-- Modal de edição -->
-    <el-dialog v-model="showEditDialog" title="Editar Locatário" width="40%">
-      <el-form label-position="top">
-        <el-form-item label="Nome">
+    <el-dialog
+      v-model="showEditDialog"
+      title="Editar Locatário"
+      @close="resetEditLocatarioForm"
+      width="40%"
+    >
+      <el-form ref="editLocatarioForm" :model="editLocatario" :rules="rules" label-position="top">
+        <el-form-item label="Nome" prop="nome">
           <el-input v-model="editLocatario.nome" placeholder="Ex: João da Silva" />
         </el-form-item>
-        <el-form-item label="CPF">
-          <el-input v-model="editLocatario.cpf" placeholder="Ex: 123.456.789-00" />
+        <el-form-item label="CPF" prop="cpf">
+          <el-input
+            v-model="editLocatario.cpf"
+            v-mask="'###.###.###-##'"
+            placeholder="Ex: 123.456.789-00"
+          />
         </el-form-item>
-        <el-form-item label="Telefone">
-          <el-input v-model="editLocatario.telefone" placeholder="Ex: (11) 91234‑5678" />
+        <el-form-item label="Telefone" prop="telefone">
+          <el-input
+            v-model="editLocatario.telefone"
+            v-mask="'(##) #####-####'"
+            placeholder="Ex: (11) 91234‑5678"
+          />
         </el-form-item>
-        <el-form-item label="E‑mail">
+        <el-form-item label="E‑mail" prop="email">
           <el-input v-model="editLocatario.email" placeholder="Ex: joao@email.com" />
         </el-form-item>
       </el-form>
@@ -82,6 +111,7 @@
 import api from '@/services/axios'
 import { ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
+import { validateCPF } from '@/utils/validacoes.js'
 
 export default {
   components: {
@@ -94,6 +124,18 @@ export default {
       locatarios: [],
       showDialog: false,
       showEditDialog: false,
+      rules: {
+        nome: [{ required: true, message: 'O nome é obrigatório', trigger: 'blur' }],
+        cpf: [
+          { required: true, message: 'O CPF é obrigatório', trigger: 'blur' },
+          { validator: validateCPF, trigger: 'blur' },
+        ],
+        telefone: [{ required: true, message: 'O telefone é obrigatório', trigger: 'blur' }],
+        email: [
+          { required: true, message: 'O e-mail é obrigatório', trigger: 'blur' },
+          { type: 'email', message: 'Formato de e-mail inválido', trigger: 'blur' },
+        ],
+      },
       newLocatario: {
         nome: '',
         cpf: '',
@@ -124,6 +166,11 @@ export default {
       this.showDialog = true
     },
     async submitNewLocatario() {
+      const form = this.$refs.newLocatarioForm
+      if (!form) return
+
+      const isValid = await form.validate().catch(() => false)
+      if (!isValid) return
       try {
         const response = await api.post('/locatarios', this.newLocatario)
         this.locatarios.push(response.data)
@@ -148,6 +195,11 @@ export default {
       this.showEditDialog = true
     },
     async submitEditLocatario() {
+      const form = this.$refs.editLocatarioForm
+      if (!form) return
+
+      const isValid = await form.validate().catch(() => false)
+      if (!isValid) return
       try {
         const response = await api.put(`/locatarios/${this.editLocatario.id}`, this.editLocatario)
         const idx = this.locatarios.findIndex((l) => l.id === this.editLocatario.id)
@@ -159,7 +211,6 @@ export default {
           customClass: 'dark-notify',
         })
       } catch (error) {
-        console.error('Erro ao atualizar locatário:', error)
         this.$notify({
           title: 'Erro ao atualizar.',
           message: 'Houve um erro ao atualizar locatário. Tente novamente mais tarde.',
@@ -187,7 +238,6 @@ export default {
             customClass: 'dark-notify',
           })
         } catch (error) {
-          console.error('Erro ao excluir locatário:', error)
           this.$notify({
             title: 'Erro ao excluir.',
             message: 'Houve um erro ao excluir locatário. Tente novamente mais tarde.',
@@ -196,6 +246,18 @@ export default {
           })
         }
       })
+    },
+    resetNewLocatarioForm() {
+      this.newLocatario = { nome: '', cpf: '', telefone: '', email: '' }
+      if (this.$refs.newLocatarioForm) {
+        this.$refs.newLocatarioForm.resetFields()
+      }
+    },
+    resetEditLocatarioForm() {
+      this.editLocatario = {}
+      if (this.$refs.editLocatarioForm) {
+        this.$refs.editLocatarioForm.resetFields()
+      }
     },
   },
 }

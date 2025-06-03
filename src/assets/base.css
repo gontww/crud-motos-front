@@ -139,6 +139,20 @@ body {
   border-radius: var(--el-input-border-radius, var(--el-border-radius-base)) !important;
 }
 
+.el-select__wrapper {
+  background-color: var(--color-background) !important;
+  border-color: var(--color-border) !important;
+  border-radius: var(--el-input-border-radius, var(--el-border-radius-base)) !important;
+}
+
+.el-select__selected-item.el-select__placeholder.is-transparent {
+  color: var(--color-border) !important;
+}
+
+.el-select__selected-item.el-select__placeholder:not(.is-transparent) {
+  color: var(--color-text) !important;
+}
+
 .el-input__inner {
   background-color: transparent !important;
   color: var(--color-text) !important;
@@ -146,8 +160,9 @@ body {
   box-shadow: none !important;
 }
 
-.el-input__inner::placeholder {
-  color: var(--color-border) !important;
+.el-input-number__decrease,
+.el-input-number__increase {
+  background-color: var(--color-background);
 }
 
 .el-input__wrapper:focus-within {

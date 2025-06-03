@@ -5,7 +5,7 @@
       class="sidebar-menu"
       background-color="var(--color-border)"
       text-color="white"
-      active-text-color="#ffd04b"
+      active-text-color="var(--el-color-primary)"
       router
     >
       <el-menu-item index="/listagem-moto">

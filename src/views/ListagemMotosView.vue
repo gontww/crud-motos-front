@@ -35,28 +35,36 @@
     </div>
 
     <!-- Modal de cadastro -->
-    <el-dialog v-model="showDialog" title="Cadastrar Nova Moto" width="40%">
-      <el-form label-position="top">
-        <el-form-item label="Placa">
-          <el-input v-model="newMoto.placa" placeholder="Ex: ABC1234" />
+    <el-dialog
+      v-model="showDialog"
+      title="Cadastrar Nova Moto"
+      @close="resetNewMotoForm"
+      width="40%"
+    >
+      <el-form ref="newMotoForm" label-position="top" :model="newMoto" :rules="rules">
+        <el-form-item label="Placa" prop="placa">
+          <el-input
+            v-model="newMoto.placa"
+            placeholder="Ex: ABC1D23"
+            maxlength="7"
+            @input="normalizePlaca"
+          />
         </el-form-item>
-        <el-form-item label="Modelo">
+
+        <el-form-item label="Modelo" prop="modelo">
           <el-input v-model="newMoto.modelo" placeholder="Ex: MT-07" />
         </el-form-item>
-        <el-form-item label="Marca">
+
+        <el-form-item label="Marca" prop="marca">
           <el-input v-model="newMoto.marca" placeholder="Ex: Yamaha" />
         </el-form-item>
-        <el-form-item label="Ano">
+
+        <el-form-item label="Ano" prop="ano">
           <el-input-number v-model="newMoto.ano" :min="1900" :max="2100" />
         </el-form-item>
-        <el-form-item label="Cor">
+
+        <el-form-item label="Cor" prop="cor">
           <el-input v-model="newMoto.cor" placeholder="Ex: Preto" />
-        </el-form-item>
-        <el-form-item label="Status">
-          <el-select v-model="newMoto.status" placeholder="Selecione o status">
-            <el-option label="Disponível" value="DISPONIVEL" />
-            <el-option label="Alugada" value="ALUGADA" />
-          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -66,28 +74,22 @@
     </el-dialog>
 
     <!-- Modal de edição -->
-    <el-dialog v-model="showEditDialog" title="Editar Moto" width="40%">
-      <el-form label-position="top">
-        <el-form-item label="Placa">
-          <el-input v-model="editMoto.placa" placeholder="Ex: ABC1234" />
+    <el-dialog v-model="showEditDialog" title="Editar Moto" @close="resetEditMotoForm" width="40%">
+      <el-form ref="editMotoForm" :model="editMoto" :rules="rules" label-position="top">
+        <el-form-item label="Placa" prop="placa">
+          <el-input v-model="editMoto.placa" placeholder="Ex: ABC1D23" />
         </el-form-item>
-        <el-form-item label="Modelo">
+        <el-form-item label="Modelo" prop="modelo">
           <el-input v-model="editMoto.modelo" placeholder="Ex: MT-07" />
         </el-form-item>
-        <el-form-item label="Marca">
+        <el-form-item label="Marca" prop="marca">
           <el-input v-model="editMoto.marca" placeholder="Ex: Yamaha" />
         </el-form-item>
-        <el-form-item label="Ano">
+        <el-form-item label="Ano" prop="ano">
           <el-input-number v-model="editMoto.ano" :min="1900" :max="2100" />
         </el-form-item>
-        <el-form-item label="Cor">
+        <el-form-item label="Cor" prop="cor">
           <el-input v-model="editMoto.cor" placeholder="Ex: Preto" />
-        </el-form-item>
-        <el-form-item label="Status">
-          <el-select v-model="editMoto.status" placeholder="Selecione o status">
-            <el-option label="Disponível" value="DISPONIVEL" />
-            <el-option label="Alugada" value="ALUGADA" />
-          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -114,13 +116,31 @@ export default {
       motorcycles: [],
       showDialog: false,
       showEditDialog: false,
+      rules: {
+        placa: [
+          {
+            required: true,
+            message: 'A placa é obrigatória',
+            trigger: 'blur',
+          },
+          {
+            pattern: /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/,
+            message: 'Placa inválida. Use o formato ABC1234 ou ABC1D23',
+            trigger: 'blur',
+          },
+        ],
+        modelo: [{ required: true, message: 'O modelo é obrigatório', trigger: 'blur' }],
+        marca: [{ required: true, message: 'A marca é obrigatória', trigger: 'blur' }],
+        ano: [{ required: true, message: 'O ano é obrigatório', trigger: 'change' }],
+        cor: [{ required: true, message: 'A cor é obrigatória', trigger: 'blur' }],
+      },
       newMoto: {
         placa: '',
         modelo: '',
         marca: '',
         ano: new Date().getFullYear(),
         cor: '',
-        status: 'DISPONIVEL',
+        status: null,
       },
       editMoto: {},
     }
@@ -134,7 +154,6 @@ export default {
         const response = await api.get('/motos')
         this.motorcycles = response.data
       } catch (error) {
-        console.error('Erro ao buscar motos:', error)
         this.$notify({
           title: 'Erro ao carregar lista de motos.',
           message: 'Houve um erro ao carregar lista de motos. Tente novamente mais tarde.',
@@ -147,6 +166,11 @@ export default {
       this.showDialog = true
     },
     async submitNewMoto() {
+      const form = this.$refs.newMotoForm
+      if (!form) return
+
+      const isValid = await form.validate().catch(() => false)
+      if (!isValid) return
       try {
         const response = await api.post('/motos', this.newMoto)
         this.motorcycles.push(response.data)
@@ -178,6 +202,12 @@ export default {
       this.showEditDialog = true
     },
     async submitEditMoto() {
+      const form = this.$refs.editMotoForm
+      if (!form) return
+
+      const isValid = await form.validate().catch(() => false)
+      if (!isValid) return
+
       try {
         const response = await api.put(`/motos/${this.editMoto.id}`, this.editMoto)
         const index = this.motorcycles.findIndex((m) => m.id === this.editMoto.id)
@@ -226,6 +256,31 @@ export default {
           })
         }
       })
+    },
+    normalizePlaca() {
+      this.newMoto.placa = this.newMoto.placa
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '')
+        .slice(0, 7)
+    },
+    resetNewMotoForm() {
+      this.newMoto = {
+        placa: '',
+        modelo: '',
+        marca: '',
+        ano: new Date().getFullYear(),
+        cor: '',
+        status: null,
+      }
+      if (this.$refs.newMotoForm) {
+        this.$refs.newMotoForm.resetFields()
+      }
+    },
+    resetEditMotoForm() {
+      this.editMoto = {}
+      if (this.$refs.editMotoForm) {
+        this.$refs.editMotoForm.resetFields()
+      }
     },
   },
 }
