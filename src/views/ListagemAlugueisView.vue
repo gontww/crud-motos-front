@@ -16,16 +16,16 @@
         <el-table-column
           prop="dataInicio"
           label="Data Início"
-          :formatter="formatarData"
+          :formatter="formatDate"
           width="150"
         />
-        <el-table-column prop="dataFim" label="Data Fim" :formatter="formatarData" />
+        <el-table-column prop="dataFim" label="Data Fim" :formatter="formatDate" />
         <el-table-column prop="locatario.nome" label="Locatário" />
         <el-table-column prop="moto.modelo" label="Moto" />
 
         <el-table-column label="Ações">
           <template #default="scope">
-            <el-button size="small" type="primary" @click="abrirDialogEditar(scope.row)">
+            <el-button size="small" type="primary" @click="openEditDialog(scope.row)">
               <template #icon><Edit /></template>
               Editar
             </el-button>
@@ -66,10 +66,9 @@
             v-model="newAluguel.motoId"
             placeholder="Selecione uma moto"
             style="width: 100%"
-            filterable
           >
             <el-option
-              v-for="moto in motosDisponiveis"
+              v-for="moto in motos"
               :key="moto.id"
               :label="`${moto.marca} ${moto.modelo} (${moto.ano})`"
               :value="moto.id"
@@ -83,8 +82,7 @@
             type="date"
             placeholder="Escolha uma data"
             style="width: 100%"
-            format="DD-MM-YYYY"
-            value="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
           />
         </el-form-item>
 
@@ -94,14 +92,13 @@
             type="date"
             placeholder="Escolha uma data"
             style="width: 100%"
-            format="DD-MM-YYYY"
-            value="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="showDialog = false">Cancelar</el-button>
-        <el-button type="primary" @click="criarNovoAluguel">Salvar</el-button>
+        <el-button type="primary" @click="submitNewAluguel">Salvar</el-button>
       </template>
     </el-dialog>
 
@@ -118,7 +115,6 @@
             v-model="editAluguel.locatarioId"
             placeholder="Selecione um locatário"
             style="width: 100%"
-            filterable
           >
             <el-option
               v-for="locatario in locatarios"
@@ -134,10 +130,9 @@
             v-model="editAluguel.motoId"
             placeholder="Selecione uma moto"
             style="width: 100%"
-            filterable
           >
             <el-option
-              v-for="moto in motosDisponiveis"
+              v-for="moto in motos"
               :key="moto.id"
               :label="`${moto.marca} ${moto.modelo} (${moto.ano})`"
               :value="moto.id"
@@ -152,7 +147,7 @@
             placeholder="Escolha uma data"
             style="width: 100%"
             format="DD/MM/YYYY"
-            value="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
           />
         </el-form-item>
 
@@ -163,13 +158,13 @@
             placeholder="Escolha uma data"
             style="width: 100%"
             format="DD/MM/YYYY"
-            value="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="showEditDialog = false">Cancelar</el-button>
-        <el-button type="primary" @click="enviarEditarAluguel">Atualizar</el-button>
+        <el-button type="primary" @click="submitEditAluguel">Atualizar</el-button>
       </template>
     </el-dialog>
   </div>
@@ -179,17 +174,14 @@
 import api from '@/services/axios'
 import { ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
-import { formatarData } from '@/utils/formatacoes.js'
 
 export default {
   components: { Plus, Edit, Delete },
   data() {
     return {
-      formatarData,
       alugueis: [],
       locatarios: [],
       motos: [],
-      motosDisponiveis: [],
       showDialog: false,
       showEditDialog: false,
       rules: {
@@ -208,12 +200,20 @@ export default {
     }
   },
   created() {
-    this.buscarAlugueis()
-    this.buscarLocatarios()
-    this.buscarMotos()
+    this.fetchAlugueis()
+    this.fetchLocatarios()
+    this.fetchMotos()
   },
   methods: {
-    async buscarAlugueis() {
+    formatDate(row, column, value) {
+      if (!value) return ''
+      const date = new Date(value)
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}/${date.getFullYear()}`
+    },
+
+    async fetchAlugueis() {
       try {
         const { data } = await api.get('/alugueis')
         this.alugueis = data
@@ -226,7 +226,7 @@ export default {
         })
       }
     },
-    async buscarLocatarios() {
+    async fetchLocatarios() {
       try {
         const { data } = await api.get('/locatarios')
         this.locatarios = data
@@ -239,11 +239,10 @@ export default {
         })
       }
     },
-    async buscarMotos() {
+    async fetchMotos() {
       try {
         const { data } = await api.get('/motos')
         this.motos = data
-        this.motosDisponiveis = data.filter((moto) => moto.status === 'DISPONIVEL')
       } catch (error) {
         this.$notify({
           title: 'Erro ao carregar motos.',
@@ -256,7 +255,7 @@ export default {
     handleAddAluguel() {
       this.showDialog = true
     },
-    async criarNovoAluguel() {
+    async submitNewAluguel() {
       const form = this.$refs.formAluguel
       if (!form) return
 
@@ -266,8 +265,8 @@ export default {
         const payload = {
           dataInicio: this.newAluguel.dataInicio,
           dataFim: this.newAluguel.dataFim,
-          motoId: this.newAluguel.motoId,
-          locatarioId: this.newAluguel.locatarioId,
+          moto: { id: this.newAluguel.motoId },
+          locatario: { id: this.newAluguel.locatarioId },
         }
 
         const { data } = await api.post('/alugueis', payload)
@@ -281,9 +280,6 @@ export default {
         })
 
         this.resetNewAluguelForm()
-        this.buscarMotos()
-        this.buscarLocatarios()
-        this.buscarAlugueis()
       } catch (error) {
         this.$notify({
           title: 'Erro ao cadastrar aluguel.',
@@ -293,8 +289,7 @@ export default {
         })
       }
     },
-    abrirDialogEditar(aluguel) {
-      this.motosDisponiveis.push(aluguel.moto)
+    openEditDialog(aluguel) {
       this.editAluguel = {
         id: aluguel.id,
         locatarioId: aluguel.locatario.id,
@@ -304,7 +299,7 @@ export default {
       }
       this.showEditDialog = true
     },
-    async enviarEditarAluguel() {
+    async submitEditAluguel() {
       const form = this.$refs.formEdicao
       if (!form) return
 
@@ -314,8 +309,8 @@ export default {
         const payload = {
           dataInicio: this.editAluguel.dataInicio,
           dataFim: this.editAluguel.dataFim,
-          motoId: this.editAluguel.motoId,
-          locatarioId: this.editAluguel.locatarioId,
+          moto: { id: this.editAluguel.motoId },
+          locatario: { id: this.editAluguel.locatarioId },
         }
 
         const { data } = await api.put(`/alugueis/${this.editAluguel.id}`, payload)
@@ -329,9 +324,6 @@ export default {
           customClass: 'dark-notify',
         })
         this.resetEditAluguelForm()
-        this.buscarMotos()
-        this.buscarLocatarios()
-        this.buscarAlugueis()
       } catch (error) {
         this.$notify({
           title: 'Erro ao atualizar aluguel.',
@@ -360,9 +352,6 @@ export default {
             type: 'success',
             customClass: 'dark-notify',
           })
-          this.buscarMotos()
-          this.buscarLocatarios()
-          this.buscarAlugueis()
         } catch (error) {
           this.$notify({
             title: 'Erro ao excluir aluguel.',
@@ -380,10 +369,6 @@ export default {
       }
     },
     resetEditAluguelForm() {
-      this.motosDisponiveis.splice(
-        this.motosDisponiveis.findIndex((moto) => moto.id === this.editAluguel.motoId),
-        1,
-      )
       this.editAluguel = {}
       if (this.$refs.formEdicao) {
         this.$refs.formEdicao.resetFields()

@@ -21,7 +21,7 @@
 
         <el-table-column label="Ações">
           <template #default="scope">
-            <el-button size="small" type="primary" @click="abrirDialogEditar(scope.row)">
+            <el-button size="small" type="primary" @click="openEditDialog(scope.row)">
               <template #icon><Edit /></template>
               Editar
             </el-button>
@@ -69,7 +69,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showDialog = false">Cancelar</el-button>
-        <el-button type="primary" @click="criarNovoMoto">Salvar</el-button>
+        <el-button type="primary" @click="submitNewMoto">Salvar</el-button>
       </template>
     </el-dialog>
 
@@ -94,7 +94,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showEditDialog = false">Cancelar</el-button>
-        <el-button type="primary" @click="enviarEditarMoto">Atualizar</el-button>
+        <el-button type="primary" @click="submitEditMoto">Atualizar</el-button>
       </template>
     </el-dialog>
   </div>
@@ -146,10 +146,10 @@ export default {
     }
   },
   created() {
-    this.buscarMotorcycles()
+    this.fetchMotorcycles()
   },
   methods: {
-    async buscarMotorcycles() {
+    async fetchMotorcycles() {
       try {
         const response = await api.get('/motos')
         this.motorcycles = response.data
@@ -165,7 +165,7 @@ export default {
     handleAddMotorcycle() {
       this.showDialog = true
     },
-    async criarNovoMoto() {
+    async submitNewMoto() {
       const form = this.$refs.newMotoForm
       if (!form) return
 
@@ -197,11 +197,11 @@ export default {
         })
       }
     },
-    abrirDialogEditar(moto) {
+    openEditDialog(moto) {
       this.editMoto = { ...moto }
       this.showEditDialog = true
     },
-    async enviarEditarMoto() {
+    async submitEditMoto() {
       const form = this.$refs.editMotoForm
       if (!form) return
 
