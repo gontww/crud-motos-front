@@ -19,7 +19,7 @@
 
         <el-table-column label="Ações" width="200">
           <template #default="scope">
-            <el-button size="small" type="primary" @click="openEditDialog(scope.row)">
+            <el-button size="small" type="primary" @click="abrirDialogEditar(scope.row)">
               <template #icon><Edit /></template>
               Editar
             </el-button>
@@ -66,7 +66,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showDialog = false">Cancelar</el-button>
-        <el-button type="primary" @click="submitNewLocatario">Salvar</el-button>
+        <el-button type="primary" @click="criarNovoLocatario">Salvar</el-button>
       </template>
     </el-dialog>
 
@@ -101,7 +101,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showEditDialog = false">Cancelar</el-button>
-        <el-button type="primary" @click="submitEditLocatario">Atualizar</el-button>
+        <el-button type="primary" @click="enviarEditarLocatario">Atualizar</el-button>
       </template>
     </el-dialog>
   </div>
@@ -146,10 +146,10 @@ export default {
     }
   },
   created() {
-    this.fetchLocatarios()
+    this.buscarLocatarios()
   },
   methods: {
-    async fetchLocatarios() {
+    async buscarLocatarios() {
       try {
         const response = await api.get('/locatarios')
         this.locatarios = response.data
@@ -165,7 +165,7 @@ export default {
     handleAddLocatario() {
       this.showDialog = true
     },
-    async submitNewLocatario() {
+    async criarNovoLocatario() {
       const form = this.$refs.newLocatarioForm
       if (!form) return
 
@@ -190,11 +190,11 @@ export default {
         })
       }
     },
-    openEditDialog(locatario) {
+    abrirDialogEditar(locatario) {
       this.editLocatario = { ...locatario }
       this.showEditDialog = true
     },
-    async submitEditLocatario() {
+    async enviarEditarLocatario() {
       const form = this.$refs.editLocatarioForm
       if (!form) return
 
