@@ -3,40 +3,46 @@
     <div class="header">
       <h1>Listagem de Aluguéis</h1>
       <el-button type="primary" @click="handleAddAluguel">
-        <template #icon>
-          <Plus />
-        </template>
+        <el-icon><Plus /></el-icon>
         Novo Aluguel
       </el-button>
     </div>
 
     <div class="table-container">
-      <el-table :data="alugueis" style="width: 100%" empty-text="Sem Dados">
+      <el-table :data="alugueis" style="width: 80%; justify-content: center" empty-text="Sem Dados">
         <el-table-column prop="moto.modelo" label="Modelo" />
         <el-table-column prop="moto.marca" label="Marca" />
         <el-table-column prop="moto.placa" label="Placa" />
         <el-table-column prop="locatario.nome" label="Locatário" />
         <el-table-column prop="dataInicio" label="Data Início" />
         <el-table-column prop="dataFim" label="Data Fim" />
-        <el-table-column label="Ações">
+        <el-table-column label="Ações" width="120">
           <template #default="scope">
-            <el-button size="small" type="primary" @click="abrirDialogEditar(scope.row)">
-              <template #icon><Edit /></template>
-              Editar
-            </el-button>
-            <el-button
-              size="small"
-              type="success"
-              @click="finalizarAluguel(scope.row)"
-              :disabled="scope.row.dataFim < new Date().toISOString().split('T')[0]"
-            >
-              <template #icon><Check /></template>
-              Finalizar
-            </el-button>
-            <el-button size="small" type="danger" @click="handleDelete(scope.row)">
-              <template #icon><Delete /></template>
-              Excluir
-            </el-button>
+            <el-dropdown trigger="click">
+              <el-button type="primary" size="small">
+                Ações
+                <el-icon class="el-icon--right"><arrow-down /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="abrirDialogEditar(scope.row)">
+                    <el-icon><Edit /></el-icon>
+                    Editar
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="scope.row.dataFim >= new Date().toISOString().split('T')[0]"
+                    @click="finalizarAluguel(scope.row)"
+                  >
+                    <el-icon><Check /></el-icon>
+                    Finalizar
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="handleDelete(scope.row)">
+                    <el-icon><Delete /></el-icon>
+                    Excluir
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -181,10 +187,10 @@
 <script>
 import api from '@/services/axios'
 import { ElMessageBox } from 'element-plus'
-import { Plus, Edit, Delete, Check } from '@element-plus/icons-vue'
+import { Plus, Edit, Delete, Check, ArrowDown } from '@element-plus/icons-vue'
 
 export default {
-  components: { Plus, Edit, Delete, Check },
+  components: { Plus, Edit, Delete, Check, ArrowDown },
   data() {
     return {
       alugueis: [],
@@ -451,7 +457,36 @@ h1 {
   color: var(--el-color-primary);
 }
 
-.table-container {
+.el-dropdown-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+}
+
+.el-dropdown-menu__item .el-icon {
+  margin-right: 4px;
+}
+
+.el-dropdown .el-button {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
   margin-top: 20px;
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.el-table {
+  width: 80%;
 }
 </style>
