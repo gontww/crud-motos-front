@@ -189,9 +189,12 @@ export default {
           status: 'DISPONIVEL',
         }
       } catch (error) {
+        const message =
+          error.response?.data ||
+          'Houve um erro ao tentar cadastrar a moto. Tente novamente mais tarde.'
         this.$notify({
           title: 'Erro ao cadastrar moto.',
-          message: 'Houve um erro ao tentar cadastrar a moto. Tente novamente mais tarde.',
+          message,
           type: 'error',
           customClass: 'dark-notify',
         })

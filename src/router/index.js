@@ -3,6 +3,7 @@ import LoginView from '@/views/LoginView.vue'
 import ListagemMotosView from '@/views/ListagemMotosView.vue'
 import ListagemLocatariosView from '@/views/ListagemLocatariosView.vue'
 import ListagemAlugueisView from '@/views/ListagemAlugueisView.vue'
+import RelatorioMotosView from '../views/RelatorioMotosView.vue'
 import { isAuthenticated } from '@/services/auth'
 
 const routes = [
@@ -29,6 +30,12 @@ const routes = [
     path: '/listagem-aluguel',
     name: 'Listagem de Aluguéis',
     component: ListagemAlugueisView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/relatorio',
+    name: 'Relatório de Motos',
+    component: RelatorioMotosView,
     meta: { requiresAuth: true },
   },
 ]

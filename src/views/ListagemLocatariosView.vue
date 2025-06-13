@@ -39,7 +39,7 @@
       @close="resetNewLocatarioForm"
       width="40%"
     >
-      <el-form ref="newLocatarioForm" :model="newLocatario" :rules="rules" label-position="top">
+      <el-form ref="formLocatario" :model="newLocatario" :rules="rules" label-position="top">
         <el-form-item label="Nome" prop="nome">
           <el-input v-model="newLocatario.nome" placeholder="Ex: João da Silva" />
         </el-form-item>
@@ -77,7 +77,7 @@
       @close="resetEditLocatarioForm"
       width="40%"
     >
-      <el-form ref="editLocatarioForm" :model="editLocatario" :rules="rules" label-position="top">
+      <el-form ref="formEdicao" :model="editLocatario" :rules="rules" label-position="top">
         <el-form-item label="Nome" prop="nome">
           <el-input v-model="editLocatario.nome" placeholder="Ex: João da Silva" />
         </el-form-item>
@@ -166,27 +166,30 @@ export default {
       this.showDialog = true
     },
     async criarNovoLocatario() {
-      const form = this.$refs.newLocatarioForm
+      const form = this.$refs.formLocatario
       if (!form) return
 
       const isValid = await form.validate().catch(() => false)
       if (!isValid) return
       try {
-        const response = await api.post('/locatarios', this.newLocatario)
-        this.locatarios.push(response.data)
+        const { data } = await api.post('/locatarios', this.newLocatario)
+        this.locatarios.push(data)
         this.showDialog = false
+
         this.$notify({
           title: 'Locatário cadastrado com sucesso!',
           type: 'success',
-          customClass: 'dark-notify',
+          customClass: 'dark-notify'
         })
-        this.newLocatario = { nome: '', cpf: '', telefone: '', email: '' }
+
+        this.resetNewLocatarioForm()
       } catch (error) {
+        const message = error.response?.data || 'Houve um erro ao cadastrar locatário. Tente novamente mais tarde.'
         this.$notify({
-          title: 'Erro ao cadastrar.',
-          message: 'Houve um erro ao cadastrar locatário. Tente novamente mais tarde.',
+          title: 'Erro ao cadastrar locatário.',
+          message,
           type: 'error',
-          customClass: 'dark-notify',
+          customClass: 'dark-notify'
         })
       }
     },
@@ -195,27 +198,30 @@ export default {
       this.showEditDialog = true
     },
     async enviarEditarLocatario() {
-      const form = this.$refs.editLocatarioForm
+      const form = this.$refs.formEdicao
       if (!form) return
 
       const isValid = await form.validate().catch(() => false)
       if (!isValid) return
       try {
-        const response = await api.put(`/locatarios/${this.editLocatario.id}`, this.editLocatario)
-        const idx = this.locatarios.findIndex((l) => l.id === this.editLocatario.id)
-        if (idx > -1) this.locatarios.splice(idx, 1, response.data)
+        const { data } = await api.put(`/locatarios/${this.editLocatario.id}`, this.editLocatario)
+        const idx = this.locatarios.findIndex(l => l.id === this.editLocatario.id)
+        if (idx > -1) this.locatarios.splice(idx, 1, data)
         this.showEditDialog = false
+
         this.$notify({
           title: 'Locatário atualizado com sucesso!',
           type: 'success',
-          customClass: 'dark-notify',
+          customClass: 'dark-notify'
         })
+        this.resetEditLocatarioForm()
       } catch (error) {
+        const message = error.response?.data || 'Houve um erro ao atualizar locatário. Tente novamente mais tarde.'
         this.$notify({
-          title: 'Erro ao atualizar.',
-          message: 'Houve um erro ao atualizar locatário. Tente novamente mais tarde.',
+          title: 'Erro ao atualizar locatário.',
+          message,
           type: 'error',
-          customClass: 'dark-notify',
+          customClass: 'dark-notify'
         })
       }
     },
@@ -226,37 +232,38 @@ export default {
         {
           confirmButtonText: 'Sim',
           cancelButtonText: 'Não',
-          type: 'warning',
-        },
+          type: 'warning'
+        }
       ).then(async () => {
         try {
           await api.delete(`/locatarios/${locatario.id}`)
-          this.locatarios = this.locatarios.filter((l) => l.id !== locatario.id)
+          this.locatarios = this.locatarios.filter(l => l.id !== locatario.id)
           this.$notify({
             title: `Locatário "${locatario.nome}" excluído com sucesso!`,
             type: 'success',
-            customClass: 'dark-notify',
+            customClass: 'dark-notify'
           })
         } catch (error) {
+          const message = error.response?.data || 'Houve um erro ao tentar excluir o locatário. Tente novamente mais tarde.'
           this.$notify({
-            title: 'Erro ao excluir.',
-            message: 'Houve um erro ao excluir locatário. Tente novamente mais tarde.',
+            title: 'Erro ao excluir locatário.',
+            message,
             type: 'error',
-            customClass: 'dark-notify',
+            customClass: 'dark-notify'
           })
         }
       })
     },
     resetNewLocatarioForm() {
       this.newLocatario = { nome: '', cpf: '', telefone: '', email: '' }
-      if (this.$refs.newLocatarioForm) {
-        this.$refs.newLocatarioForm.resetFields()
+      if (this.$refs.formLocatario) {
+        this.$refs.formLocatario.resetFields()
       }
     },
     resetEditLocatarioForm() {
       this.editLocatario = {}
-      if (this.$refs.editLocatarioForm) {
-        this.$refs.editLocatarioForm.resetFields()
+      if (this.$refs.formEdicao) {
+        this.$refs.formEdicao.resetFields()
       }
     },
   },

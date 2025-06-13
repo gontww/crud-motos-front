@@ -6,28 +6,32 @@
         <template #icon>
           <Plus />
         </template>
-        Cadastrar Aluguel
+        Novo Aluguel
       </el-button>
     </div>
 
     <div class="table-container">
-      <el-table :data="alugueis" empty-text="Sem Dados">
-        <el-table-column prop="id" label="ID" />
-        <el-table-column
-          prop="dataInicio"
-          label="Data Início"
-          :formatter="formatarData"
-          width="150"
-        />
-        <el-table-column prop="dataFim" label="Data Fim" :formatter="formatarData" />
+      <el-table :data="alugueis" style="width: 100%" empty-text="Sem Dados">
+        <el-table-column prop="moto.modelo" label="Modelo" />
+        <el-table-column prop="moto.marca" label="Marca" />
+        <el-table-column prop="moto.placa" label="Placa" />
         <el-table-column prop="locatario.nome" label="Locatário" />
-        <el-table-column prop="moto.modelo" label="Moto" />
-
+        <el-table-column prop="dataInicio" label="Data Início" />
+        <el-table-column prop="dataFim" label="Data Fim" />
         <el-table-column label="Ações">
           <template #default="scope">
             <el-button size="small" type="primary" @click="abrirDialogEditar(scope.row)">
               <template #icon><Edit /></template>
               Editar
+            </el-button>
+            <el-button
+              size="small"
+              type="success"
+              @click="finalizarAluguel(scope.row)"
+              :disabled="scope.row.dataFim < new Date().toISOString().split('T')[0]"
+            >
+              <template #icon><Check /></template>
+              Finalizar
             </el-button>
             <el-button size="small" type="danger" @click="handleDelete(scope.row)">
               <template #icon><Delete /></template>
@@ -39,12 +43,7 @@
     </div>
 
     <!-- Modal de cadastro -->
-    <el-dialog
-      v-model="showDialog"
-      title="Cadastrar Novo Aluguel"
-      width="40%"
-      @close="resetNewAluguelForm"
-    >
+    <el-dialog v-model="showDialog" title="Novo Aluguel" width="40%" @close="resetNewAluguelForm">
       <el-form ref="formAluguel" label-position="top" :rules="rules" :model="newAluguel">
         <el-form-item label="Locatário" prop="locatarioId">
           <el-select
@@ -83,8 +82,9 @@
             type="date"
             placeholder="Escolha uma data"
             style="width: 100%"
-            format="DD-MM-YYYY"
-            value="YYYY-MM-DD"
+            format="DD/MM/YYYY"
+            value-format="YYYY-MM-DD"
+            :disabled-date="disablePastDates"
           />
         </el-form-item>
 
@@ -94,8 +94,9 @@
             type="date"
             placeholder="Escolha uma data"
             style="width: 100%"
-            format="DD-MM-YYYY"
-            value="YYYY-MM-DD"
+            format="DD/MM/YYYY"
+            value-format="YYYY-MM-DD"
+            :disabled-date="disablePastDates"
           />
         </el-form-item>
       </el-form>
@@ -152,7 +153,8 @@
             placeholder="Escolha uma data"
             style="width: 100%"
             format="DD/MM/YYYY"
-            value="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
+            :disabled-date="disablePastDates"
           />
         </el-form-item>
 
@@ -163,7 +165,8 @@
             placeholder="Escolha uma data"
             style="width: 100%"
             format="DD/MM/YYYY"
-            value="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
+            :disabled-date="disablePastDates"
           />
         </el-form-item>
       </el-form>
@@ -178,14 +181,12 @@
 <script>
 import api from '@/services/axios'
 import { ElMessageBox } from 'element-plus'
-import { Plus, Edit, Delete } from '@element-plus/icons-vue'
-import { formatarData } from '@/utils/formatacoes.js'
+import { Plus, Edit, Delete, Check } from '@element-plus/icons-vue'
 
 export default {
-  components: { Plus, Edit, Delete },
+  components: { Plus, Edit, Delete, Check },
   data() {
     return {
-      formatarData,
       alugueis: [],
       locatarios: [],
       motos: [],
@@ -193,16 +194,18 @@ export default {
       showDialog: false,
       showEditDialog: false,
       rules: {
-        locatarioId: [{ required: true, message: 'Selecione um locatário', trigger: 'change' }],
-        motoId: [{ required: true, message: 'Selecione uma moto', trigger: 'change' }],
-        dataInicio: [{ required: true, message: 'Escolha a data de início', trigger: 'blur' }],
-        dataFim: [{ required: true, message: 'Escolha a data de fim', trigger: 'blur' }],
+        locatarioId: [{ required: true, message: 'O locatário é obrigatório', trigger: 'change' }],
+        motoId: [{ required: true, message: 'A moto é obrigatória', trigger: 'change' }],
+        dataInicio: [
+          { required: true, message: 'A data de início é obrigatória', trigger: 'change' },
+        ],
+        dataFim: [{ required: true, message: 'A data de fim é obrigatória', trigger: 'change' }],
       },
       newAluguel: {
         locatarioId: null,
         motoId: null,
-        dataInicio: '',
-        dataFim: '',
+        dataInicio: null,
+        dataFim: null,
       },
       editAluguel: {},
     }
@@ -213,6 +216,9 @@ export default {
     this.buscarMotos()
   },
   methods: {
+    disablePastDates(date) {
+      return date < new Date(new Date().setHours(0, 0, 0, 0))
+    },
     async buscarAlugueis() {
       try {
         const { data } = await api.get('/alugueis')
@@ -285,9 +291,11 @@ export default {
         this.buscarLocatarios()
         this.buscarAlugueis()
       } catch (error) {
+        const message =
+          error.response?.data || 'Houve um erro ao cadastrar aluguel. Tente novamente mais tarde.'
         this.$notify({
           title: 'Erro ao cadastrar aluguel.',
-          message: 'Houve um erro ao cadastrar aluguel. Tente novamente mais tarde.',
+          message,
           type: 'error',
           customClass: 'dark-notify',
         })
@@ -333,17 +341,53 @@ export default {
         this.buscarLocatarios()
         this.buscarAlugueis()
       } catch (error) {
+        const message =
+          error.response?.data || 'Houve um erro ao atualizar aluguel. Tente novamente mais tarde.'
         this.$notify({
           title: 'Erro ao atualizar aluguel.',
-          message: 'Houve um erro ao atualizar aluguel. Tente novamente mais tarde.',
+          message,
           type: 'error',
           customClass: 'dark-notify',
         })
       }
     },
+    async finalizarAluguel(aluguel) {
+      try {
+        await ElMessageBox.confirm(
+          `Tem certeza que deseja finalizar o aluguel da moto "${aluguel.moto.modelo}"?`,
+          'Finalizar Aluguel',
+          {
+            confirmButtonText: 'Sim',
+            cancelButtonText: 'Não',
+            type: 'warning',
+          },
+        )
+
+        await api.post(`/alugueis/${aluguel.id}/finalizar`)
+        this.$notify({
+          title: 'Aluguel finalizado com sucesso!',
+          type: 'success',
+          customClass: 'dark-notify',
+        })
+        this.buscarAlugueis()
+        this.buscarMotos()
+      } catch (error) {
+        if (error !== 'cancel') {
+          const message =
+            error.response?.data ||
+            'Houve um erro ao finalizar o aluguel. Tente novamente mais tarde.'
+          this.$notify({
+            title: 'Erro ao finalizar aluguel.',
+            message,
+            type: 'error',
+            customClass: 'dark-notify',
+          })
+        }
+      }
+    },
     handleDelete(aluguel) {
       ElMessageBox.confirm(
-        `Tem certeza que deseja excluir o aluguel de "${aluguel.locatario.nome}"?`,
+        `Tem certeza que deseja excluir o aluguel da moto "${aluguel.moto.modelo}"?`,
         'Excluir Aluguel',
         {
           confirmButtonText: 'Sim',
@@ -354,19 +398,19 @@ export default {
         try {
           await api.delete(`/alugueis/${aluguel.id}`)
           this.alugueis = this.alugueis.filter((a) => a.id !== aluguel.id)
-
           this.$notify({
-            title: `Aluguel de "${aluguel.locatario.nome}" excluído com sucesso!`,
+            title: `Aluguel da moto "${aluguel.moto.modelo}" excluído com sucesso!`,
             type: 'success',
             customClass: 'dark-notify',
           })
           this.buscarMotos()
-          this.buscarLocatarios()
-          this.buscarAlugueis()
         } catch (error) {
+          const message =
+            error.response?.data ||
+            'Houve um erro ao tentar excluir o aluguel. Tente novamente mais tarde.'
           this.$notify({
             title: 'Erro ao excluir aluguel.',
-            message: 'Houve um erro ao excluir aluguel. Tente novamente mais tarde.',
+            message,
             type: 'error',
             customClass: 'dark-notify',
           })
@@ -374,16 +418,17 @@ export default {
       })
     },
     resetNewAluguelForm() {
-      this.newAluguel = {}
+      this.newAluguel = {
+        locatarioId: null,
+        motoId: null,
+        dataInicio: null,
+        dataFim: null,
+      }
       if (this.$refs.formAluguel) {
         this.$refs.formAluguel.resetFields()
       }
     },
     resetEditAluguelForm() {
-      this.motosDisponiveis.splice(
-        this.motosDisponiveis.findIndex((moto) => moto.id === this.editAluguel.motoId),
-        1,
-      )
       this.editAluguel = {}
       if (this.$refs.formEdicao) {
         this.$refs.formEdicao.resetFields()
@@ -407,12 +452,6 @@ h1 {
 }
 
 .table-container {
-  display: flex;
-  justify-content: center;
   margin-top: 20px;
-}
-
-.el-table {
-  width: 80%;
 }
 </style>

@@ -22,6 +22,11 @@
         <el-icon name="Document"></el-icon>
         <span>Aluguéis</span>
       </el-menu-item>
+
+      <el-menu-item index="/relatorio">
+        <el-icon name="Document"></el-icon>
+        <span>Relatório</span>
+      </el-menu-item>
     </el-menu>
   </aside>
 </template>
