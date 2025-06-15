@@ -65,7 +65,7 @@ export default {
     const carregarPerfil = async () => {
       try {
         const token = localStorage.getItem('token')
-        const response = await axios.get('http://localhost:8080/api/usuarios/perfil', {
+        const response = await axios.get('http://localhost:8080/usuarios/perfil', {
           headers: { Authorization: `Bearer ${token}` },
         })
         form.value = {
@@ -92,7 +92,7 @@ export default {
           senha: form.value.senha || undefined, // Só envia a senha se foi preenchida
         }
 
-        await axios.put('http://localhost:8080/api/usuarios/perfil', dadosParaEnviar, {
+        await axios.put('http://localhost:8080/usuarios/perfil', dadosParaEnviar, {
           headers: { Authorization: `Bearer ${token}` },
         })
 
