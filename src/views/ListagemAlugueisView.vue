@@ -16,6 +16,7 @@
         <el-table-column prop="locatario.nome" label="Locatário" />
         <el-table-column prop="dataInicio" label="Data Início" />
         <el-table-column prop="dataFim" label="Data Fim" />
+        <el-table-column prop="status" label="Status" />
         <el-table-column label="Ações" width="120">
           <template #default="scope">
             <el-dropdown trigger="click">
@@ -25,12 +26,15 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item @click="abrirDialogEditar(scope.row)">
+                  <el-dropdown-item
+                    v-if="scope.row.status === 'ATIVO'"
+                    @click="abrirDialogEditar(scope.row)"
+                  >
                     <el-icon><Edit /></el-icon>
                     Editar
                   </el-dropdown-item>
                   <el-dropdown-item
-                    v-if="scope.row.dataFim >= new Date().toISOString().split('T')[0]"
+                    v-if="scope.row.status === 'ATIVO'"
                     @click="finalizarAluguel(scope.row)"
                   >
                     <el-icon><Check /></el-icon>
@@ -369,7 +373,7 @@ export default {
           },
         )
 
-        await api.post(`/alugueis/${aluguel.id}/finalizar`)
+        await api.get(`/alugueis/${aluguel.id}/finalizar`)
         this.$notify({
           title: 'Aluguel finalizado com sucesso!',
           type: 'success',
