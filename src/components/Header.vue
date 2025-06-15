@@ -15,8 +15,7 @@ export default {
   name: 'HeaderComponent',
   methods: {
     goToProfile() {
-      // Implementação futura
-      alert('Funcionalidade de perfil ainda não implementada.')
+      this.$router.push('/perfil')
     },
     logout() {
       localStorage.removeItem('token')

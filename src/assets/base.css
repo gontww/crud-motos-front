@@ -203,3 +203,12 @@ body {
 .el-table thead tr th:first-child {
   border-left: 1px solid var(--el-border-color) !important;
 }
+
+.el-card {
+  background-color: var(--color-background) !important;
+  border-color: var(--color-border);
+}
+
+.el-card__header {
+  border-bottom: var(--color-border);
+}
