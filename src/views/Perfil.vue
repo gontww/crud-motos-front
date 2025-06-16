@@ -41,55 +41,56 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
 
 export default {
   name: 'PerfilView',
-  setup() {
-    const formRef = ref(null)
-    const loading = ref(false)
-    const form = ref({
-      nome: '',
-      login: '',
-      senha: '',
-    })
-
-    const rules = {
-      nome: [{ required: true, message: 'Por favor, insira seu nome', trigger: 'blur' }],
-      login: [{ required: true, message: 'Por favor, insira seu login', trigger: 'blur' }],
-      senha: [{ min: 6, message: 'A senha deve ter pelo menos 6 caracteres', trigger: 'blur' }],
+  data() {
+    return {
+      formRef: null,
+      loading: false,
+      form: {
+        nome: '',
+        login: '',
+        senha: '',
+      },
+      rules: {
+        nome: [{ required: true, message: 'Por favor, insira seu nome', trigger: 'blur' }],
+        login: [{ required: true, message: 'Por favor, insira seu login', trigger: 'blur' }],
+        senha: [{ min: 6, message: 'A senha deve ter pelo menos 6 caracteres', trigger: 'blur' }],
+      },
     }
-
-    const carregarPerfil = async () => {
+  },
+  mounted() {
+    this.carregarPerfil()
+  },
+  methods: {
+    async carregarPerfil() {
       try {
         const token = localStorage.getItem('token')
         const response = await axios.get('http://localhost:8080/usuarios/perfil', {
           headers: { Authorization: `Bearer ${token}` },
         })
-        form.value = {
-          nome: response.data.nome,
-          login: response.data.login,
-          senha: '', // Não carregamos a senha por segurança
-        }
+        this.form.nome = response.data.nome
+        this.form.login = response.data.login
+        this.form.senha = '' // não preencher a senha por segurança
       } catch (error) {
         ElMessage.error('Erro ao carregar perfil')
       }
-    }
-
-    const salvarPerfil = async () => {
-      if (!formRef.value) return
+    },
+    async salvarPerfil() {
+      if (!this.$refs.formRef) return
 
       try {
-        await formRef.value.validate()
-        loading.value = true
+        await this.$refs.formRef.validate()
+        this.loading = true
 
         const token = localStorage.getItem('token')
         const dadosParaEnviar = {
-          nome: form.value.nome,
-          login: form.value.login,
-          senha: form.value.senha || undefined, // Só envia a senha se foi preenchida
+          nome: this.form.nome,
+          login: this.form.login,
+          senha: this.form.senha || undefined,
         }
 
         await axios.put('http://localhost:8080/usuarios/perfil', dadosParaEnviar, {
@@ -97,23 +98,13 @@ export default {
         })
 
         ElMessage.success('Perfil atualizado com sucesso!')
-        form.value.senha = '' // Limpa o campo de senha após salvar
+        this.form.senha = ''
       } catch (error) {
         ElMessage.error('Erro ao atualizar perfil')
       } finally {
-        loading.value = false
+        this.loading = false
       }
-    }
-
-    onMounted(carregarPerfil)
-
-    return {
-      formRef,
-      form,
-      rules,
-      loading,
-      salvarPerfil,
-    }
+    },
   },
 }
 </script>
