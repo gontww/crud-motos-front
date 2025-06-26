@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "moto": {
+      "id": 1,
+      "modelo": "MT-07",
+      "marca": "Yamaha",
+      "placa": "ABC1D23",
+      "ano": 2022,
+      "status": "DISPONIVEL"
+    },
+    "locatario": {
+      "id": 1,
+      "nome": "João da Silva"
+    },
+    "dataInicio": "2030-06-01",
+    "dataFim": "2030-06-10",
+    "status": "ATIVO"
+  },
+  {
+    "id": 2,
+    "moto": {
+      "id": 2,
+      "modelo": "CB 500F",
+      "marca": "Honda",
+      "placa": "DEF2E34",
+      "ano": 2021,
+      "status": "ALUGADA"
+    },
+    "locatario": {
+      "id": 2,
+      "nome": "Maria Oliveira"
+    },
+    "dataInicio": "2030-05-15",
+    "dataFim": "2030-05-20",
+    "status": "FINALIZADO"
+  }
+] 
