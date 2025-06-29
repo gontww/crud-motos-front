@@ -7,7 +7,7 @@
       "marca": "Yamaha",
       "placa": "ABC1D23",
       "ano": 2022,
-      "status": "DISPONIVEL"
+      "status": "INDISPONIVEL"
     },
     "locatario": {
       "id": 1,
@@ -25,7 +25,7 @@
       "marca": "Honda",
       "placa": "DEF2E34",
       "ano": 2021,
-      "status": "ALUGADA"
+      "status": "DISPONIVEL"
     },
     "locatario": {
       "id": 2,
