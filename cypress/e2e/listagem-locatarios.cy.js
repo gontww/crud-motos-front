@@ -3,7 +3,7 @@
 describe('Tela de Listagem de Locatários', () => {
   beforeEach(() => {
     // Simula usuário autenticado
-    window.localStorage.setItem('token', 'fake-jwt-token')
+    window.localStorage.setItem('token', 'jwt-token-teste')
     // Mocka a resposta da listagem de locatários
     cy.fixture('locatarios.json').then((locatarios) => {
       cy.intercept('GET', '**/locatarios', locatarios).as('getLocatarios')

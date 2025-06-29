@@ -3,7 +3,7 @@
 describe('Tela de Listagem de Motos', () => {
   beforeEach(() => {
     // Simula usuário autenticado
-    window.localStorage.setItem('token', 'fake-jwt-token')
+    window.localStorage.setItem('token', 'jwt-token-teste')
     // Mocka a resposta da listagem de motos
     cy.fixture('motos.json').then((motos) => {
       cy.intercept('GET', '**/motos', motos).as('getMotos')
