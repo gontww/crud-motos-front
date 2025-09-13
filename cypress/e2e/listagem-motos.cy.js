@@ -76,4 +76,4 @@ describe('Tela de Listagem de Motos', () => {
     cy.wait('@deleteMoto')
     cy.contains('Moto "MT-07" excluída com sucesso!')
   })
-}) 
+})

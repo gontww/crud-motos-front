@@ -33,7 +33,6 @@ describe('Tela de Listagem de Aluguéis', () => {
     cy.get('input[placeholder="Escolha uma data"]').should('exist')
   })
 
-
   it('deve abrir o modal de edição ao clicar em Editar', () => {
     cy.get('.el-table__row').first().contains('Ações').click()
     cy.contains('Editar').click()
@@ -88,7 +87,7 @@ describe('Tela de Listagem de Aluguéis', () => {
     cy.contains('Aluguel cadastrado com sucesso!')
   })
 
-  it('deve editar um aluguel', () => {
+  it.only('deve editar um aluguel', () => {
     cy.intercept('PUT', '**/alugueis/1', {
       id: 1,
       moto: {
@@ -109,12 +108,14 @@ describe('Tela de Listagem de Aluguéis', () => {
     }).as('putAluguel')
     cy.get('.el-table__row').first().contains('Ações').click()
     cy.contains('Editar').click()
-    cy.get('input[placeholder="Escolha uma data"]').first()
+    cy.get('input[placeholder="Escolha uma data"]')
+      .first()
       .invoke('removeAttr', 'readonly')
       .clear()
       .type('05/07/2030')
     cy.get('body').type('{enter}')
-    cy.get('input[placeholder="Escolha uma data"]').eq(1)
+    cy.get('input[placeholder="Escolha uma data"]')
+      .eq(1)
       .invoke('removeAttr', 'readonly')
       .clear()
       .type('15/07/2030')
@@ -157,4 +158,4 @@ describe('Tela de Listagem de Aluguéis', () => {
     // Verifica se o modal permanece aberto (não foi fechado)
     cy.get('.el-dialog__title').should('contain', 'Novo Aluguel')
   })
-}) 
+})

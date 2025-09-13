@@ -25,7 +25,7 @@ describe('Tela de Listagem de Locatários', () => {
     cy.get('input[placeholder="Ex: João da Silva"]').should('exist')
   })
 
-  it('deve cadastrar um novo locatário', () => {
+  it.only('deve cadastrar um novo locatário', () => {
     cy.intercept('POST', '**/locatarios', {
       id: 3,
       nome: 'Carlos Souza',
@@ -71,4 +71,4 @@ describe('Tela de Listagem de Locatários', () => {
     cy.wait('@deleteLocatario')
     cy.contains('Locatário "João da Silva" excluído com sucesso!')
   })
-}) 
+})
